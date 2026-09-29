@@ -1,8 +1,9 @@
 # Mapsource agent integration
 
 1. Read https://api.mapsource.io/llms.txt and https://api.mapsource.io/llms-full.txt.
-2. Call https://api.mapsource.io/api/status. Require `engine.mode=overpass` and
-   `engine.ready=true` before describing Overpass output as planet/local data.
+2. Call https://api.mapsource.io/api/status. Require `engine.mode=overpass`,
+   `engine.ready=true` and `overpass.complete=true` before describing Overpass
+   output as planet/local data; `complete=false` means results are missing data.
 3. Use Streamable HTTP at https://api.mapsource.io/mcp with
    `Authorization: Bearer $MAPSOURCE_API_KEY`. Store the value in your client's
    **secret-header/environment configuration**, not literally in a URL or chat.
