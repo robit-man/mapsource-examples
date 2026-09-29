@@ -10,8 +10,12 @@ test('bounded feature selectors cannot inject QL', () => {
 test('no key in URLs, no external request destinations', async () => {
   assert.throws(() => createClient({ MAPSOURCE_BASE_URL: 'https://secret@example.com' }));
   const client = createClient({});
-  await assert.rejects(client.request('//example.com/api/elevation'), /Only Mapsource/);
-  await assert.rejects(client.request('/api/elevation'), /Set MAPSOURCE_API_KEY/);
+  await assert.rejects(client.request('//example.com/elevation'), /Only Mapsource/);
+  await assert.rejects(client.request('/../elevation'), /Only Mapsource/);
+  await assert.rejects(client.request('/elevation'), /Set MAPSOURCE_API_KEY/);
+  // The website host serves the same API under /api.
+  await assert.rejects(createClient({ MAPSOURCE_BASE_URL: 'https://mapsource.io/api' }).request('/elevation'), /Set MAPSOURCE_API_KEY/);
+  assert.throws(() => createClient({ MAPSOURCE_BASE_URL: 'https://api.mapsource.io/other' }));
 });
 test('display converter handles points, building areas, and relation linework', () => {
   const geometry = [{lon:0,lat:0},{lon:1,lat:0},{lon:1,lat:1},{lon:0,lat:0}];

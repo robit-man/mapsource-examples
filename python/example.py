@@ -24,9 +24,11 @@ def feature_query(category, bbox, limit=100):
 def request(path, body=None, authenticated=True):
     base = os.getenv("MAPSOURCE_BASE_URL", "https://api.mapsource.io")
     parsed = urllib.parse.urlsplit(base)
-    if parsed.username or parsed.password or parsed.query or parsed.fragment or parsed.path not in ("", "/") or not (parsed.scheme == "https" or parsed.scheme == "http" and parsed.hostname in ("localhost", "127.0.0.1")):
+    if parsed.username or parsed.password or parsed.query or parsed.fragment or parsed.path.rstrip("/") not in ("", "/api") or not (parsed.scheme == "https" or parsed.scheme == "http" and parsed.hostname in ("localhost", "127.0.0.1")):
         raise ValueError("Use an HTTPS origin, or loopback HTTP for development.")
-    if not path.startswith("/api/"):
+    # Paths are relative to the API host (or https://mapsource.io/api); the key
+    # is only ever sent under that base.
+    if not path.startswith("/") or path.startswith("//") or ".." in path:
         raise ValueError("Only Mapsource API paths are permitted.")
     headers = {"Accept": "application/json", "User-Agent": "Mapsource-Examples/0.1 (+https://github.com/robit-man/mapsource-examples)"}
     if authenticated:
@@ -48,12 +50,12 @@ def request(path, body=None, authenticated=True):
 
 def features(category, bbox):
     query = feature_query(category, bbox)
-    status, _ = request("/api/status", authenticated=False)
+    status, _ = request("/status", authenticated=False)
     engine = status.get("engine", {})
     allow_fixture = os.getenv("ALLOW_FIXTURE") == "true"
     if not (engine.get("mode") == "overpass" and engine.get("ready")) and not (allow_fixture and engine.get("mode") == "fixture"):
         raise ValueError("Planet queries are not ready; check /status. ALLOW_FIXTURE=true permits labeled test objects only.")
-    data, headers = request("/api/interpreter", body=query)
+    data, headers = request("/interpreter", body=query)
     mode = headers.get("X-Overpass-Engine-Mode")
     if mode != "overpass" and not allow_fixture:
         raise ValueError("The response did not come from the planet engine.")
@@ -67,14 +69,14 @@ def main():
     parser.add_argument("coordinates", type=float, nargs="*")
     args = parser.parse_args()
     if args.task in ("status", "catalog"):
-        result, _ = request("/api/status" if args.task == "status" else "/api/tiles/catalog", authenticated=False)
+        result, _ = request("/status" if args.task == "status" else "/tiles/catalog", authenticated=False)
     elif args.task == "elevation":
         if len(args.coordinates) != 2:
             parser.error("elevation requires LAT LON")
         lat, lon = args.coordinates
         if not (math.isfinite(lat) and math.isfinite(lon) and abs(lat) <= 85.05112878 and abs(lon) <= 180):
             raise ValueError("Invalid coordinates.")
-        result, _ = request(f"/api/elevation?lat={lat}&lon={lon}")
+        result, _ = request(f"/elevation?lat={lat}&lon={lon}")
     else:
         result = features(args.task, args.coordinates)
     print(json.dumps(result, indent=2))

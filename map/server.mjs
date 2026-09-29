@@ -34,7 +34,7 @@ createServer(async (req, res) => {
       const result = await api.features(url.searchParams.get('category') || 'cafes', (url.searchParams.get('bbox') || '').split(',').map(Number));
       data = { engineMode: result.engineMode, geojson: toGeoJSON(result.data) };
     } else if (url.pathname === '/elevation') data = await api.elevation(Number(url.searchParams.get('lat') ?? NaN), Number(url.searchParams.get('lon') ?? NaN));
-    else if (url.pathname === '/status') data = await api.json('/api/status', { authenticated: false });
+    else if (url.pathname === '/status') data = await api.json('/status', { authenticated: false });
     else { res.writeHead(404).end(); return; }
     res.writeHead(200, { 'Content-Type': 'application/json' }).end(JSON.stringify(data));
   } catch (error) {
