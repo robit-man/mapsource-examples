@@ -22,7 +22,7 @@ def feature_query(category, bbox, limit=100):
     return f'[out:json][timeout:30];nwr{selectors[category]}({",".join(map(str, bbox))});out geom {limit};'
 
 def request(path, body=None, authenticated=True):
-    base = os.getenv("MAPSOURCE_BASE_URL", "https://mapsource.io")
+    base = os.getenv("MAPSOURCE_BASE_URL", "https://api.mapsource.io")
     parsed = urllib.parse.urlsplit(base)
     if parsed.username or parsed.password or parsed.query or parsed.fragment or parsed.path not in ("", "/") or not (parsed.scheme == "https" or parsed.scheme == "http" and parsed.hostname in ("localhost", "127.0.0.1")):
         raise ValueError("Use an HTTPS origin, or loopback HTTP for development.")

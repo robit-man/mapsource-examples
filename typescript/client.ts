@@ -9,7 +9,7 @@ export function featureQuery(category: string, bbox: number[], limit = 100): str
 }
 
 export function createClient(env = process.env) {
-  const base = new URL(env.MAPSOURCE_BASE_URL || "https://mapsource.io");
+  const base = new URL(env.MAPSOURCE_BASE_URL || "https://api.mapsource.io");
   if (base.username || base.password || base.search || base.hash || base.pathname !== "/" || (base.protocol !== "https:" && !(base.protocol === "http:" && ["127.0.0.1", "localhost"].includes(base.hostname)))) throw new Error("Use an HTTPS API origin (or loopback HTTP for development).");
   async function request(path: string, options: { method?: string; body?: string; authenticated?: boolean } = {}) {
     const target = new URL(path, base);
