@@ -6,6 +6,9 @@
 3. Use Streamable HTTP at https://api.mapsource.io/mcp with
    `Authorization: Bearer $MAPSOURCE_API_KEY`. Store the value in your client's
    **secret-header/environment configuration**, not literally in a URL or chat.
+   REST paths on https://api.mapsource.io work with or without the `/api`
+   prefix (`/api/interpreter` or `/interpreter`); the prefixed form is
+   canonical and also works on https://mapsource.io.
 4. Discover https://api.mapsource.io/mcp.json. Free tools: `service_status`,
    `basemap_catalog`. Subscriber tools: `elevation`, `find_features`, `overpass_query`.
 5. For cafés, call `find_features` with arguments:
